@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Jen and Chad's Photo Booth</title>
+        <script src="jquery-1.6.2.min.js" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" href="/style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+        <style type="text/css" media="screen">
+            html, body {
+                width:100%;
+                height:100%;
+                margin:0;
+                padding:0;
+                overflow:hidden;
+            }
+        
+            .preload {
+                position:absolute;
+                margin-left:-10000px;
+            }
+            .button {
+                width:400px;
+                height:400px;
+                background: transparent url(assets/green-button.png) no-repeat;
+                margin-left:auto;
+                margin-right:auto;
+                background-position:17px 0;
+            }
+            
+            .redbutton {
+                width:400px;
+                height:400px;
+                background: transparent url(assets/red-button.png) no-repeat;
+                margin-left:auto;
+                margin-right:auto;
+                background-position:17px 0;
+            }
+            
+            .blackbutton {
+                width:400px;
+                height:400px;
+                background: transparent url(assets/black-button.png) no-repeat;
+                margin-left:auto;
+                margin-right:auto;
+                background-position:17px 0;
+            }
+            
+            #countdown {
+                background-image:none;
+                background-color:transparent;
+                border:none;
+                box-shadow:none;
+                text-align:center;
+            }
+            
+            #countdown h2 {
+                font-size:280px;
+                margin:0 0;
+/*                font-family:sans-serif;                */
+            }
+            
+            #countdown h3 {
+                font-size:82px;
+            }
+            
+            #photographing, #processing {
+                text-align:center;
+                position:absolute;
+                left:0; top:0;
+                margin:0;
+                padding:0;
+                background:black;
+                width:100%;
+                height:100%;
+            }
+            
+            #processing {
+                text-align:center;
+            }
+            
+            #processing svg {
+                margin-left:auto;
+                margin-right:auto;
+                width:400px;
+            }
+            
+            #photographing h2, #processing h2 {
+                color:white;
+                font-size:140px;
+                text-shadow: 0px 3px 8px #2A2A2A;
+                -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,1)), color-stop(20%, rgba(0,0,0,.5)), to(rgba(0,0,0,1)));
+            }
+            
+            #photographing h3, #processing h3 {
+                color:white;
+                text-shadow: 0px 3px 8px #2A2A2A;
+                -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,1)), color-stop(20%, rgba(0,0,0,.5)), to(rgba(0,0,0,1)));
+            }
+            
+            #photographing h3 {
+                padding-top:30px;                
+            }
+            
+            
+            #photographing h3:first-child {
+                padding-top:0px;
+            }
+
+            #review {
+                margin-top:300px;
+                width:1200px;
+            }
+            
+            #review h2 {
+                margin-top:-80px;
+            }
+            
+            .photos {
+                margin-left:auto;
+                margin-right:auto;
+                width:2300px;
+            }
+            
+            .photos .photo {
+                width:400px;
+                height:300px;
+                border:dashed 4px #999;
+                background: -webkit-gradient(linear, left top, left bottom, from(#1F1F1F), to(#262626));
+                border-radius:10px;
+                float:left;
+                margin-right:20px;
+                margin-left:20px;
+            }
+            
+            .photos .photo.done {
+                background:white;
+                border:solid 1px black;
+                border-radius:0px;
+                width:420px;
+                height:400px;
+                margin-right:10px;
+            }
+            
+            .photos .photo .frame {
+                display:none;
+            }
+            
+            .photos .photo.done .frame {
+                display:block;
+                width:400px;
+                height:300px;
+                margin-left:auto;
+                margin-right:auto;
+                background: -webkit-gradient(linear, left top, left bottom, from(#645B49), to(#625932));
+            }
+            
+            @-webkit-keyframes rotate {
+              from {
+                -webkit-transform: rotate(0deg);
+              }
+              to { 
+                -webkit-transform: rotate(360deg);
+              }
+            }
+            
+            svg.spinner
+            {
+                -webkit-animation-name:             rotate; 
+                -webkit-animation-duration:         3s; 
+                -webkit-animation-iteration-count:  infinite;
+                -webkit-animation-timing-function: linear;
+                margin-top:25px;
+            }
+            
+            #countdown {
+                position:absolute;
+                left:170px;
+                top:30px;
+                font-size:140px;
+                color:white;
+            }
+            
+            .photo {
+                position:relative;
+                z-index:10;
+            }
+            
+            #review {
+                margin-top:320px;
+                width:1835px;
+                margin-left:auto;
+                margin-right:auto;
+            }
+            
+            #review .choice {
+                width:600px;
+                margin-right:10px;
+                float:left;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>PHOTO BOOTH</h1>
+        <img src="jelly.jpg" width="885" height="1224" class="jelly"/> 
+        <img src="brittle.png" width="357" height="409" class="brittle"/>
+        <img class="preload" src="assets/green-button.png" width="400" height="400" class="brittle"/>
+        <img class="preload" src="assets/green-button-depressed.png" width="400" height="400" class="brittle"/>
+        <img class="preload" src="assets/red-button.png" width="400" height="400" class="brittle"/>
+        <img class="preload" src="assets/red-button-depressed.png" width="400" height="400" class="brittle"/>
+        <img class="preload" src="assets/black-button.png" width="400" height="400" class="brittle"/>
+        <img class="preload" src="assets/black-button-depressed.png" width="400" height="400" class="brittle"/>
+        <div id="intro" class="paper">
+            <h2>Press the Green Button to start taking photos</h2>
+            <div class="greenbutton button">&nbsp;</div>
+        </div>
+        </div>
+        <div id="photographing" style="display:none;">
+            <h3>Taking 5 photographs</h3>
+            <div class="photos">
+                
+            </div>
+            <br style="clear:both;">
+            <h3></h3>
+            
+            <h2></h2>
+        </div>
+        <div id="processing" class="paper" style="display:none;">
+            <h3>Processing</h3>
+            <svg width="400" height="400" viewBox="0 0 300 300"
+                 xmlns="http://www.w3.org/2000/svg" version="1.1">
+              <path d="M 150,0
+                       a 150,150 0 0,1 106.066,256.066
+                       l -35.355,-35.355
+                       a -100,-100 0 0,0 -70.711,-170.711 z"
+                    fill="#3d7fe6">
+                <animateTransform attributeName="transform" attributeType="XML"
+                       type="rotate" from="0 150 150" to="360 150 150"
+                       begin="0s" dur="1s" fill="freeze" repeatCount="indefinite" />
+              </path>
+            </svg>
+        </div>
+        <div id="review" class="paper" style="display:none;">
+            <div class="choice">
+                <div class="greenbutton button">&nbsp;</div>
+                <h2>Print and post to chadandjen.net</h2>                
+            </div>
+            <div class="choice">
+                <div class="redbutton button">&nbsp;</div>
+                <h2>Print only</h2>      
+            </div>
+            <div class="choice">
+                <div class="blackbutton button">&nbsp;</div>
+                <h2>Try again</h2>
+            </div>
+            <br style="clear:both;">
+        </div>
+    </body>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" charset="utf-8">
+    
+        var COUNTDOWN = 3; // seconds
+        var PHOTOS = 5;
+        var INTERVAL = 3; // seconds
+    
+        $(document).ready(function(){
+            $('.button').each(function(i){
+                var that = this;
+                setInterval(function(){
+                    var src = $(that).css('background-image');
+                    if(src.indexOf('depressed') === -1){
+                        $(that).css('background-image', src.replace(/\.png/, '-depressed.png'));
+                    }else{
+                        $(that).css('background-image', src.replace(/-depressed/, ''));
+                    }
+                }, 800 + (100 * i));
+            });
+        });
+        
+        $(document).keydown(function(e){
+            switch(e.keyCode){
+                case 65: // a
+                    if($('#intro').is(':visible')){
+                        $('#intro').slideUp(function(){
+                            enterPhotographingMode();
+                            // $('#countdown').show();
+                            // var c = COUNTDOWN;
+                            // $('#countdown').html('<h2>'+c+'</h2><h3>Prepare Yourself!</h3>');
+                            // $('#countdown h2').fadeOut(1200);
+                            // var ref = setInterval(function(){
+                            //     c--;
+                            //     if(c < 0){
+                            //         enterPhotographingMode();
+                            //         clearInterval(ref);
+                            //     }else{
+                            //         $('#countdown').html('<h2>'+c+'</h2><h3>Prepare Yourself!</h3>');
+                            //         $('#countdown h2').fadeOut(1200);
+                            //     }
+                            // }, 1000);
+                        });
+                    }
+                    console.log('GREEN');
+                    break;
+                    
+                case 83: // s
+                    console.log('RED');                
+                    break;
+                    
+                case 68: // d
+                    console.log('BLACK');
+                    if($('#review').is(':visible')){
+                        enterStartView();
+                    }
+                    break;
+            }
+        });
+        
+        function enterStartView(){
+            $('.photo').remove();
+            $('#review').hide();
+            $('#intro').show();
+        }
+        
+        
+        function enterPhotographingMode(){
+            $('#intro').hide();
+            $('#countdown').hide();
+            $('#review').hide();
+            var el = $('#photographing');
+            el.fadeIn();
+            var photos = 0;
+            var seconds = 0;
+            for(var i = 0; i<PHOTOS; i++){
+                el.find('.photos').append('<div style=" -webkit-transform: rotate('+(Math.floor(Math.random() * 11) - 5)+'deg);" class="photo">&nbsp;<div class="frame">&nbsp;</div></div>');
+            }
+            var photo = $(el.find('.photos .photo')[photos]);
+            photo.append('<svg class="spinner" width="200" height="200" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" version="1.1"><path d="M 150,0 a 150,150 0 0,1 106.066,256.066 l -35.355,-35.355 a -100,-100 0 0,0 -70.711,-170.711 z" fill="#E6E6E6"></path></svg>');
+            photo.append('<span id="countdown"></span>');
+            var ref = setInterval(function(){
+                seconds++;
+                if(seconds === 2 && photos === 0){
+                    $(el.find('h3')[1]).text('Get Ready!');
+                }
+                if(photos === 1){
+                    $(el.find('h3')[1]).text('Looking Good!');
+                }
+                if(photos === 2){
+                    $(el.find('h3')[1]).text('');
+                }
+                if(photos === PHOTOS - 2){
+                    $(el.find('h3')[1]).text('Two more to go...');
+                }
+                if(photos === PHOTOS - 1){
+                    $(el.find('h3')[1]).text('Almost Done!');
+                }
+                if(photos === PHOTOS){
+                    clearTimeout(ref);
+                    $('.photo .spinner').remove();
+                    $(el.find('.photos .photo')[photos-1]).addClass('done');
+                    $('#countdown').remove();
+                    setTimeout(function(){
+                        enterPhotoReview();
+                    }, INTERVAL * 1000);
+                     $(el.find('h3')[1]).text('');
+                }else if(seconds === 0){
+                    $('.photo .spinner').remove();
+                    $(el.find('.photos .photo')[photos-1]).addClass('done');
+                    $('#countdown').remove();
+                    var photo = $(el.find('.photos .photo')[photos]);
+                    photo.append('<svg class="spinner" width="200" height="200" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" version="1.1"><path d="M 150,0 a 150,150 0 0,1 106.066,256.066 l -35.355,-35.355 a -100,-100 0 0,0 -70.711,-170.711 z" fill="#E6E6E6"></path></svg>');
+                    photo.append('<span id="countdown"></span>');
+                }else{
+                    $('#countdown').text(INTERVAL - seconds + 1);
+                    $('#countdown').animate({fontSize:'50px', marginTop: '60px', paddingLeft: '20px'}, 1000, function(){
+                        $('#countdown').css({'font-size': '140px', marginTop: '0px', paddingLeft: '0px'});
+                    });
+                    if(seconds % INTERVAL === 0){
+                        photos++;
+                        seconds = -1;
+                    }                    
+                }
+            }, 1000);
+            socket.emit('capture-images', {photos: PHOTOS, interval: INTERVAL});                
+        }
+                
+        function enterPhotoReview(){
+            $('#intro').hide();
+            $('#countdown').hide();
+            $('#review').hide();
+            // $('#photographing').hide();
+            $('#photographing').fadeOut(function(){
+                $('#review').show();
+                $('.photos').clone().insertBefore('#review');
+                $('#photographing .photos .photo').remove();
+            });
+        }
+        
+        var socket = io.connect('http://localhost');
+        socket.on('connected', function (data) {
+            console.log('connected to socket.io service');
+        });
+        
+        socket.on('photo-ready', function(data){
+            console.log(data.filename);
+        });
+        
+    </script>
+</html>
