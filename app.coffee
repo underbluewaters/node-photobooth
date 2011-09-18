@@ -29,7 +29,12 @@ io.sockets.on 'connection', (socket) ->
       # update the countdown
       socket.emit 'capturing', frame: frame
     task.on 'captured', (filename, frame, total_frames) ->
+      # create a mongoose objectid
+      small = "#{__dirname}/thumbnails/#{id}_small.jpg"
+      medium = "#{__dirname}/thumbnails/#{id}_medium.jpg"
       # create small and medium thumbnails
+      convert filename, small, 500, 300, () ->
+        
       # gonna need flow control here to do two images at once?
       # once captured, let the client know it can display the photo
       socket.emit 'photo-ready',  filename: filename, 
