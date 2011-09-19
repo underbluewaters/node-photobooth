@@ -7,6 +7,7 @@ spinner_svg = '''
 '''
 
 watch = seconds: 0, photos: 0
+current_record_id = null
 
 $(document).ready () ->
   $('.button').each (i) ->
@@ -41,8 +42,12 @@ $(document).ready () ->
         if intro.is ':visible'
           intro.slideUp () ->
             enterPhotographingMode()
+        if $('#review').is ':visible'
+          enterPrint(current_record_id, true)
       when 83 #s
         console.log 'red'
+        if $('#review').is ':visible'
+          enterPrint(current_record_id, false)
       when 68 #d
         console.log 'black'
         review = $('#review')
@@ -50,9 +55,12 @@ $(document).ready () ->
           enterStartView()
         
 enterStartView = () ->
+  $('#final_review').hide()
   $('.photo').remove()
+  $('body > .photos').remove()
   $('#review').hide()
   $('#intro').show()
+  $('h1').show()
 
 enterPhotographingMode = () ->
   $(element).hide() for element in ['#intro', '#review', '#countdown']
@@ -92,7 +100,6 @@ startCountdown = (num) ->
     clearInterval(ref) if left is 0 or watch.photos is not num - 1
     watch.seconds = left
     watch.photos = num - 1
-    console.log(left)
     countdown.text(left)
     # make sure to scope these to the div in case photographs are taken in 
     # quick succession by a mistake of the camera PTP interface
@@ -104,14 +111,78 @@ startCountdown = (num) ->
 window.startCountdown = startCountdown
 
 enterPhotoReview = () ->
-  $('#intro, #countdown, #review').hide()
-  $('#photographing').fadeOut () ->
-    $('#review').show()
-    $('.photos').clone().insertBefore '#review'
+  $('#intro, #countdown, #review, #photographing').hide()
+  $('#final_review').fadeOut 500, () ->
+    $('.photos').clone().insertBefore('#review')
+    $('.photos').show()
     $('#photographing .photos .photo').remove()
+    $('#review').show()
+    
+displayFrame = (frame, thumb) ->
+  if frame is PHOTOS
+    $($('#photographing h3')[1]).text('')
+  div = $("#photo#{frame}")
+  div.append('<img src="'+thumb+'" width="400" height="300">')
+  div.find('.frame').fadeOut 500
+
+enterFinalReview = (data) ->
+  for image in data.images
+    console.log image.original
+    $('#final_review').append('<img src="'+image.medium+'">');
+  setTimeout () ->
+    $('#final_review').show()
+    $('.photos').fadeOut 500, () ->
+      $('#intro, #countdown, #review').hide()
+      $('#photographing').fadeOut () ->
+        showDetail()
+  , 500
+
+showDetail = () ->
+  front = $('#final_review img.front')
+  next = null
+  if front and front.length
+    next = front.next()
+    front.removeClass('front')
+  else
+    next = $('#final_review img:first')
+  if front.length and front.next().length is 0
+    $('#final_review img').remove()
+    enterPhotoReview()
+  else
+    next.addClass('front')
+    setTimeout showDetail, 6000
+
+printInterval = null
+    
+enterPrint = (id, share) ->
+  $('#print .messages').hide()
+  $('body > .photos').remove()
+  $('.paper').hide()
+  $('#print').slideDown()
+  $('#print').append spinner_svg
+  socket.emit 'print', _id: id, share: share
+  printInterval = setInterval isPrinterReady, 5000
+
+isPrinterReady = () ->
+  socket.emit 'printerReady?'
 
 socket = io.connect('http://localhost');
+socket.on 'printerReady', (data) ->
+  console.log 'ready'
+  clearInterval(printInterval)
+  if $('#print').is(':visible')
+    $('#print').slideUp () ->
+      enterStartView()
+
 socket.on 'connected', (data) ->
   console.log 'connected to socket.io service'
 socket.on 'photo-ready', (data) ->
-    console.log data.filename
+    displayFrame data.frame, data.small
+socket.on 'capturing', (data) ->
+  startCountdown data.frame + 1
+
+socket.on 'photos-done', (data) ->
+  current_record_id = data._id
+  setTimeout ()->
+    enterFinalReview(data)
+  , 500
