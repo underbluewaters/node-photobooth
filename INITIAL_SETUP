@@ -1,0 +1,63 @@
+# INITIAL SETUP
+# enter the mongo shell
+mongo
+# connect to the database
+use photobooth
+# remove any old test photos
+db.sessions.remove()
+
+# remove any old test photos
+rm node-photobooth/transfer/public/pdf
+rm node-photobooth/transfer/public/snaps
+
+make sure all iphones, ipads, etc are unplugged!!! These mess with gphoto2
+
+# order probably doesn't matter, but be wary
+plug in camera
+plug in controller
+
+make sure controller is sending signal using arduino application or screen
+
+set usb device appropriately as necessary
+coffee app.coffee
+
+App is at http://localhost:3000
+
+# TROUBLESHOOTING
+
+So far no re-occuring problems. If one occurs
+
+1) Open the shell using the eject key on the keypad. See any errors in the terminal from the node process
+2) Try to reboot using:
+  coffee app.coffee
+  this command must be run from /Users/cburt/Working/node-photobooth/
+  
+CHECK CONTROLLER
+
+open Arduino (Mac App), got to Tools -> Serial Monitor and look for output when pressing buttons
+
+if that doesn't work, quit Arduino. Unplug, then plug it in. Restart Arduino and try again. If that works, quit Arduino (it hogs the serial port), and restart the app using `coffee app.coffee` in the terminal.
+
+CHECK THE CAMERA
+
+try this from anywhere in Terminal
+gphoto2 --capture-image
+
+if that doesn't work the camera isn't operational. Restart procedure:
+1) unplug
+2) check power, turn off/on camera, etc
+3) plug back in
+4) press the shutter button to make the connection between the computer/camera
+5) in terminal, type `killall PTPCamera`
+6) try the above gphoto2 command again
+
+Make sure no ipads, iphones, etc are plugged in!!!!! Gphoto is very robust, except against this.
+
+
+BROWSER AND ANIMATIONS ARE SLOW
+
+Close all Safari windows and restart Safari. Maybe try chrome if that doesn't work. Fullscreen can be entered/exited like any other Lion app.
+
+COUNTDOWN OUT OF SYNC
+
+See above. Countdown will never be super-super accurate. Inconsistency is due to autofocus lag.

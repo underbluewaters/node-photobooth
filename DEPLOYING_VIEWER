@@ -4,4 +4,5 @@ coffee
 rm -rf chadandjen.net/transfer
 cp -r node-photobooth/transfer ../chadandjen.net/
 
+remove comments to add photo links
 reboot chadandjen.net
