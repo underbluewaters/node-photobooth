@@ -8,6 +8,7 @@
 	  "coffee-script": ">= 1.1.2",
 	  "socket.io": ">=0.8.0",
 	  "pdfkit": ">=0.1.5",
-	  "mongode": ">=0.0.5"
+	  "mongode": ">=0.0.5",
+	  "serialport": ">=0.3.0"
   }
 }

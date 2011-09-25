@@ -37,24 +37,40 @@ $(document).ready () ->
   $(document).keydown (e) ->
     switch e.keyCode
       when 65 # a
-        console.log 'green'
-        intro = $('#intro')
-        if intro.is ':visible'
-          intro.slideUp () ->
+        pressButton 'green'
+      when 83 # s
+        pressButton 'red'
+      when 68 # d
+        pressButton 'black'
+
+window.STATE = 'start'    
+
+flash = (id) ->
+  el = $(id)
+  el.show()
+  setTimeout (() -> el.hide()), 100
+
+pressButton = (data) ->
+    switch data
+      when 'green'
+        flash '#green'
+        if window.STATE is 'start'
             enterPhotographingMode()
-        if $('#review').is ':visible'
+        if window.STATE is 'review'
           enterPrint(current_record_id, true)
-      when 83 #s
-        console.log 'red'
-        if $('#review').is ':visible'
+      when 'red'
+        flash '#red'
+        if window.STATE is 'review'
           enterPrint(current_record_id, false)
-      when 68 #d
-        console.log 'black'
-        review = $('#review')
-        if review.is ':visible'
+        if window.STATE is 'finalReview'
+          cancelDetail()
+      when 'black'
+        flash '#black'
+        if window.STATE is 'review'
           enterStartView()
         
 enterStartView = () ->
+  window.STATE = 'start'
   $('#final_review').hide()
   $('.photo').remove()
   $('body > .photos').remove()
@@ -63,26 +79,29 @@ enterStartView = () ->
   $('h1').show()
 
 enterPhotographingMode = () ->
-  $(element).hide() for element in ['#intro', '#review', '#countdown']
-  el = $('#photographing')
-  el.fadeIn()
-  photos_el = el.find('.photos')
-  # Add photo divs to scene
-  for num in [1..PHOTOS]
-    angle = (Math.floor(Math.random() * 11) - 5)
-    photos_el.append """
-      <div id="photo#{num}" style="-webkit-transform: rotate(#{angle}deg);" class="photo">
-        &nbsp;
-        <div class="frame">
+  window.STATE = 'photographing'
+  intro = $('#intro')
+  intro.slideUp () ->
+    $('#intro, #review, #countdown').hide()
+    el = $('#photographing')
+    el.fadeIn()
+    photos_el = el.find('.photos')
+    # Add photo divs to scene
+    for num in [1..PHOTOS]
+      angle = (Math.floor(Math.random() * 11) - 5)
+      photos_el.append """
+        <div id="photo#{num}" style="-webkit-transform: rotate(#{angle}deg);" class="photo">
           &nbsp;
+          <div class="frame">
+            &nbsp;
+          </div>
         </div>
-      </div>
-    """
-  socket.emit 'capture-images', photos: PHOTOS, interval: INTERVAL
-  # wait a bit for the PTP interface to boot up
-  setTimeout () ->
-    startCountdown 1
-  , 500
+      """
+    socket.emit 'capture-images', photos: PHOTOS, interval: INTERVAL
+    # wait a bit for the PTP interface to boot up
+    setTimeout () ->
+      startCountdown 1
+    , 500
 
 startCountdown = (num) ->
   $("#photo"+(num - 1)).addClass('done')
@@ -111,6 +130,7 @@ startCountdown = (num) ->
 window.startCountdown = startCountdown
 
 enterPhotoReview = () ->
+  window.STATE = 'review'
   $('#intro, #countdown, #review, #photographing').hide()
   $('#final_review').fadeOut 500, () ->
     $('.photos').clone().insertBefore('#review')
@@ -126,8 +146,8 @@ displayFrame = (frame, thumb) ->
   div.find('.frame').fadeOut 500
 
 enterFinalReview = (data) ->
+  window.STATE = 'finalReview'
   for image in data.images
-    console.log image.original
     $('#final_review').append('<img src="'+image.medium+'">');
   setTimeout () ->
     $('#final_review').show()
@@ -136,6 +156,8 @@ enterFinalReview = (data) ->
       $('#photographing').fadeOut () ->
         showDetail()
   , 500
+
+window.detailTimeout = null
 
 showDetail = () ->
   front = $('#final_review img.front')
@@ -146,15 +168,24 @@ showDetail = () ->
   else
     next = $('#final_review img:first')
   if front.length and front.next().length is 0
-    $('#final_review img').remove()
-    enterPhotoReview()
+    window.detailTimeout = null
+    cancelDetail()
   else
     next.addClass('front')
-    setTimeout showDetail, 6000
+    window.detailTimeout = setTimeout showDetail, 6000
+
+cancelDetail = () ->
+  if window.detailTimeout
+    clearTimeout window.detailTimeout
+    window.detailTimeout = null
+  $('#final_review img').remove()
+  enterPhotoReview()
+  
 
 printInterval = null
-    
+
 enterPrint = (id, share) ->
+  window.STATE = 'printing'
   $('#print .messages').hide()
   $('body > .photos').remove()
   $('.paper').hide()
@@ -168,14 +199,12 @@ isPrinterReady = () ->
 
 socket = io.connect('http://localhost');
 socket.on 'printerReady', (data) ->
-  console.log 'ready'
   clearInterval(printInterval)
   if $('#print').is(':visible')
     $('#print').slideUp () ->
       enterStartView()
 
 socket.on 'connected', (data) ->
-  console.log 'connected to socket.io service'
 socket.on 'photo-ready', (data) ->
     displayFrame data.frame, data.small
 socket.on 'capturing', (data) ->
@@ -186,3 +215,6 @@ socket.on 'photos-done', (data) ->
   setTimeout ()->
     enterFinalReview(data)
   , 500
+
+socket.on 'arduino-data', (data) ->
+  pressButton data

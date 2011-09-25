@@ -4,7 +4,7 @@
         <title>Jen and Chad's Photo Booth</title>
         <script src="jquery-1.6.2.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="coffee-script.js" type="text/javascript" charset="utf-8"></script>
-        <link rel="stylesheet" href="/style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+        <link rel="stylesheet" href="/photobooth-style.css" type="text/css" media="screen" title="no title" charset="utf-8">
         <style type="text/css" media="screen">
             html, body {
                 width:100%;
@@ -271,9 +271,45 @@
                 padding:0px;
                 margin:0px;
             }
+            
+            .flash {
+                position:absolute;
+                left:0;
+                top:0;
+                height:25px;
+                width:100%;
+                z-index:100;
+                display:none;
+            }
+            
+            #green {
+                background-color:green;
+            }
+            
+            #red {
+                background-color:red;
+            }
+
+            #black {
+                background-color:black;
+                border-bottom:solid grey 2px;
+            }
+
+            #final_review p {
+                font-size:24px;
+                color:white;
+                position:absolute;
+                bottom:10px;
+                right:10px;
+                color:#B14B45;
+            }
+
         </style>
     </head>
     <body>
+        <div class="flash" id="green"></div>
+        <div class="flash" id="red"></div>
+        <div class="flash" id="black"></div>
         <h1>PHOTO BOOTH</h1>
         <img src="jelly.jpg" width="885" height="1224" class="jelly"/> 
         <img src="brittle.png" width="357" height="409" class="brittle"/>
@@ -299,6 +335,7 @@
             <h2></h2>
         </div>
         <div id="final_review" style="display:none;">
+            <p>press the red button to skip</p>
         </div>
         <div id="review" class="paper" style="display:none;">
             <div class="choice">

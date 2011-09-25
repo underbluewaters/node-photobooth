@@ -18,12 +18,12 @@ generate_pdf = (take, filename, callback) ->
   doc.fontSize(12)
   doc.text('download these photos at http://chadandjen.net/photos', 92, 121)
 
-  doc.image("public/#{take.images[0].original}", 0, 0, fit: [144, 96])
-  doc.image("public/#{take.images[1].original}", 144, 0, fit: [144, 96])
-  doc.image("public/#{take.images[2].original}", 288, 0, fit: [144, 96])
+  doc.image("transfer/public/#{take.images[0].original}", 0, 0, fit: [144, 96])
+  doc.image("transfer/public/#{take.images[1].original}", 144, 0, fit: [144, 96])
+  doc.image("transfer/public/#{take.images[2].original}", 288, 0, fit: [144, 96])
 
-  doc.image("public/#{take.images[3].original}", 0, 144, fit: [216, 144])
-  doc.image("public/#{take.images[4].original}", 216, 144, fit: [216, 144])
+  doc.image("transfer/public/#{take.images[3].original}", 0, 144, fit: [216, 144])
+  doc.image("transfer/public/#{take.images[4].original}", 216, 144, fit: [216, 144])
   
   doc.write filename, () ->
     callback(filename)
@@ -35,7 +35,7 @@ module.exports = {
   render_record: (idString, callback) ->
     id = new mongo.BSONPure.ObjectID(idString)
     sessions.findOne '_id': id, (err, record) ->
-      generate_pdf(record, "public/pdf/#{record._id}.pdf", callback)
+      generate_pdf(record, "transfer/public/pdf/#{record._id}.pdf", callback)
       
 }
 

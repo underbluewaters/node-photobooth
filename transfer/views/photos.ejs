@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Jen and Chad's Photo Booth</title>
+        <script src="jquery-1.6.2.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="jquery.tmpl.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="coffee-script.js" type="text/javascript" charset="utf-8"></script>
+		<script src="underscore-min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="backbone-min.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" href="/colorbox/colorbox.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<script src="/colorbox/jquery.colorbox-min.js" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" href="photobooth-style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+        <style type="text/css" media="screen">
+            h1 {
+                font-size:48px;
+                text-shadow: 0px 1px 1px #E3E6D9;
+                padding-top:10px;
+                margin:0;
+                margin-bottom:10px;
+            }
+            
+            a.chadandjen {
+                margin:10px;
+                color:#059;
+            }
+            
+            #toolbar {
+                z-index:10;
+                text-align:center;
+                position:fixed;
+/*                height:80px;*/
+                padding-bottom:10px;
+                width:100%;
+                background: #fef5ee url(backgrounds/paper.gif) repeat;
+                border-bottom:solid 1px #7B7B7B;
+            }
+            
+            @media all and (max-width: 900px) {
+                a.chadandjen {
+                    position:relative;
+                }
+            }
+            
+            #content {
+                padding:50px;
+                padding-top:170px;
+            }
+            
+            .photo {
+                float:left;
+                margin-right:20px;
+                margin-left:20px;
+                margin-top:20px;
+                background:white;
+                border:solid 1px black;
+                width:325px;
+                height:300px;
+                position:relative;
+            }
+            
+            .photo img {
+                position:absolute;
+                top:10px;
+                left:6px;
+                display:block;
+                width:310px;
+                height:225px;
+                margin-left:auto;
+                margin-right:auto;
+                border:solid 1px black;
+            }
+            
+            .photo p {
+                position:absolute;
+                bottom:10px;
+                width:100%;
+                text-align:center;
+            }
+            
+            .photo p a {
+                color:#5893B1;
+            }
+            
+            .photo p a:hover {
+                color:#587799;
+            }
+                        
+        </style>
+    </head>
+    <body>
+        <div id="toolbar">
+            <h1>Shared Photobooth Sessions</h1>            
+            <a class="chadandjen" href="http://chadandjen.net">Back to chadandjen.net</a>
+        </div>
+        <div id="content">
+            Loading...
+        </div>
+    </body>
+    <script src="photos.coffee" type="text/coffeescript" charset="utf-8"></script>
+</html>

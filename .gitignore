@@ -1,3 +1,7 @@
 node_modules
 public/photos/*
 public/pdf/*
+transfer/public/pdf/*.pdf
+transfer/public/snaps/*.jpg
+.DS_Store
+transfer/public/sessions.json
