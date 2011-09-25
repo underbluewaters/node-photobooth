@@ -1,0 +1,7 @@
+coffee
+  > require('./sessions_json.coffee').write()
+  
+rm -rf chadandjen.net/transfer
+cp -r node-photobooth/transfer ../chadandjen.net/
+
+reboot chadandjen.net
